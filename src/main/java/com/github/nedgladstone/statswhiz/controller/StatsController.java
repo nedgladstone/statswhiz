@@ -7,6 +7,7 @@ import com.github.nedgladstone.statswhiz.repository.StatsRepository;
 import io.micronaut.data.exceptions.EmptyResultException;
 import io.micronaut.http.annotation.Controller;
 import io.micronaut.http.annotation.Get;
+import io.micronaut.http.annotation.QueryValue;
 import io.micronaut.scheduling.TaskExecutors;
 import io.micronaut.scheduling.annotation.ExecuteOn;
 import org.hibernate.PersistentObjectException;
@@ -40,7 +41,7 @@ public class StatsController {
     }
 
     @Get("/find")
-    public Stats findStats(long playerId, int year) {
+    public Stats findStats(@QueryValue long playerId, @QueryValue int year) {
         logger.info("In stats find: player " + playerId + ", year " + year);
         Player player = playerController.getPlayer(playerId);
         if (player == null) {
@@ -63,15 +64,15 @@ public class StatsController {
     }
 
     @Get("/find2")
-    public List<Stats> findStats2(int year) {
+    public List<Stats> findStats2(@QueryValue int year) {
         logger.info("In stats find2: year " + year);
         return statsRepository.find(year);
     }
 
-    @Get("/test")
-    public String test(String testParam) {
-        logger.info("In test");
-        return "Yep, server is working. I was passed " + testParam;
+    @Get("/ping")
+    public String test(@QueryValue String testParam) {
+        logger.info("In ping");
+        return "Pong " + testParam;
     }
 
     private Stats findStatsInDb(Player player, int year) {

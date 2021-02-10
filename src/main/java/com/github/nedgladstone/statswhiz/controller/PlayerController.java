@@ -3,9 +3,9 @@ package com.github.nedgladstone.statswhiz.controller;
 import com.github.nedgladstone.statswhiz.client.MlbClient;
 import com.github.nedgladstone.statswhiz.model.*;
 import com.github.nedgladstone.statswhiz.repository.PlayerRepository;
-import com.github.nedgladstone.statswhiz.repository.StatsRepository;
 import io.micronaut.http.annotation.Controller;
 import io.micronaut.http.annotation.Get;
+import io.micronaut.http.annotation.QueryValue;
 import io.micronaut.scheduling.TaskExecutors;
 import io.micronaut.scheduling.annotation.ExecuteOn;
 import org.slf4j.Logger;
@@ -39,7 +39,7 @@ public class PlayerController {
     }
 
     @Get("/find")
-    public Player findPlayer(String lastName, String firstName) {
+    public Player findPlayer(@QueryValue String lastName, @QueryValue String firstName) {
         return findPlayerInDb(lastName, firstName);
     }
 

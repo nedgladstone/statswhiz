@@ -1,6 +1,7 @@
 package com.github.nedgladstone.statswhiz.model;
 
 import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.github.nedgladstone.statswhiz.util.StatsUtils;
 
 import javax.persistence.*;
 import java.time.LocalDate;
@@ -48,6 +49,9 @@ public class Player {
     @Column(name = "throwing_hand")
     private char throwingHand;
 
+    @Column(name = "position")
+    private int position;
+
     @OneToMany(mappedBy = "player", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @JsonManagedReference
     private List<Stats> stats = new ArrayList<>();
@@ -57,10 +61,23 @@ public class Player {
         return mlbHand.charAt(0);
     }
 
+    private static int mlbPositionToInt(String mlbPositionId, String mlbPosition) {
+        int mlbPositionInt = StatsUtils.tryParseInt(mlbPositionId);
+        if ((mlbPositionInt >= 1) && (mlbPositionInt <= 9)) {
+            // Position ID was valid
+            return mlbPositionInt;
+        }
+        switch (mlbPosition.toUpperCase()) {
+            case ("IF"): return 10; // Code for generalist infielder
+            case ("OF"): return 11; // Code for generalist outfielder
+            default:     return 0;
+        }
+    }
+
     public Player() {
     }
 
-    public Player(Long mlbPlayerId, String nameLast, String nameFirst, LocalDate birthDate, String birthCountry, String college, int heightInches, int weightPounds, LocalDate proDebutDate, char battingHand, char throwingHand) {
+    public Player(Long mlbPlayerId, String nameLast, String nameFirst, LocalDate birthDate, String birthCountry, String college, int heightInches, int weightPounds, LocalDate proDebutDate, char battingHand, char throwingHand, int position) {
         this.mlbPlayerId = mlbPlayerId;
         this.nameLast = nameLast;
         this.nameFirst = nameFirst;
@@ -72,6 +89,7 @@ public class Player {
         this.proDebutDate = proDebutDate;
         this.battingHand = battingHand;
         this.throwingHand = throwingHand;
+        this.position = position;
     }
 
     public Player(PlayerMlb playerMlb) {
@@ -86,6 +104,7 @@ public class Player {
         this.proDebutDate = LocalDateTime.parse(playerMlb.getProDebutDate()).toLocalDate();
         this.battingHand = mlbHandedToChar(playerMlb.getBattingHand());
         this.throwingHand = mlbHandedToChar(playerMlb.getThrowingHand());
+        this.position = mlbPositionToInt(playerMlb.getPositionId(), playerMlb.getPosition());
     }
 
     public Player addStats(Stats stats) {
@@ -184,6 +203,14 @@ public class Player {
 
     public void setThrowingHand(char throwingHand) {
         this.throwingHand = throwingHand;
+    }
+
+    public int getPosition() {
+        return position;
+    }
+
+    public void setPosition(int position) {
+        this.position = position;
     }
 
     public List<Stats> getStats() {
